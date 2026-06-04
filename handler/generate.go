@@ -6,8 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"go-openai-server/models"
+	"go-openai-server/repository"
 	"go-openai-server/service"
 )
+
+var wordRepo *repository.WordRepository
+
+func SetWordRepository(repo *repository.WordRepository) {
+	wordRepo = repo
+}
 
 func Generate(c *gin.Context) {
 
@@ -25,9 +32,22 @@ func Generate(c *gin.Context) {
 		return
 	}
 
-	result, err :=
+	if wordRepo == nil {
+		c.JSON(
+			http.StatusInternalServerError,
+			gin.H{
+				"error": "word repository is not initialized",
+			},
+		)
+
+		return
+	}
+
+	words, err :=
 		service.Generate(
+			c.Request.Context(),
 			req.Topic,
+			wordRepo,
 		)
 
 	if err != nil {
@@ -45,7 +65,7 @@ func Generate(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		models.GenerateResponse{
-			Result: result,
+			Words: words,
 		},
 	)
 }
