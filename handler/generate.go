@@ -10,10 +10,10 @@ import (
 	"go-openai-server/service"
 )
 
-var wordRepo *repository.WordRepository
+var quizRepo *repository.QuizRepository
 
-func SetWordRepository(repo *repository.WordRepository) {
-	wordRepo = repo
+func SetQuizRepository(repo *repository.QuizRepository) {
+	quizRepo = repo
 }
 
 func Generate(c *gin.Context) {
@@ -32,22 +32,22 @@ func Generate(c *gin.Context) {
 		return
 	}
 
-	if wordRepo == nil {
+	if quizRepo == nil {
 		c.JSON(
 			http.StatusInternalServerError,
 			gin.H{
-				"error": "word repository is not initialized",
+				"error": "quiz repository is not initialized",
 			},
 		)
 
 		return
 	}
 
-	words, err :=
-		service.Generate(
+	bundle, err :=
+		service.GeneratePart5Quiz(
 			c.Request.Context(),
 			req.Topic,
-			wordRepo,
+			quizRepo,
 		)
 
 	if err != nil {
@@ -64,8 +64,6 @@ func Generate(c *gin.Context) {
 
 	c.JSON(
 		http.StatusOK,
-		models.GenerateResponse{
-			Words: words,
-		},
+		bundle,
 	)
 }

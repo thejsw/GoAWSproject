@@ -26,11 +26,11 @@ var router *gin.Engine
 var initOnce sync.Once
 var initErr error
 
-func setupRouter(wordRepo *repository.WordRepository) *gin.Engine {
+func setupRouter(quizRepo *repository.QuizRepository) *gin.Engine {
 
 	r := gin.Default()
 
-	handler.SetWordRepository(wordRepo)
+	handler.SetQuizRepository(quizRepo)
 
 	r.Use(cors.Default())
 
@@ -59,8 +59,8 @@ func initialize() error {
 		return err
 	}
 
-	wordRepo := repository.NewWordRepository(pool)
-	router = setupRouter(wordRepo)
+	quizRepo := repository.NewQuizRepository(pool)
+	router = setupRouter(quizRepo)
 	ginLambda = ginadapter.New(router)
 
 	return nil
